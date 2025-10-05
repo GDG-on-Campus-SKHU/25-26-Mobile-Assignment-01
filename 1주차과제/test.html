@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 학생 데이터 예시
+    let students = [
+    { name: "홍길동", scores: [90, 80, 85] },
+    { name: "임꺽정", scores: [70, 75, 72] },
+    { name: "이몽룡", scores: [100, 95, 98] }
+];
+
+/**
+ * 합계와 평균을 계산한다.
+ * rest 파라미터 또는 배열 구조 분해를 활용할 수 있다.
+ */
+function getSumAndAverage(...scores) {
+  if (scores.length === 0) return [0, 0]; //갯수세기
+  const sum = scores.reduce((acc, current) => acc + current, 0); //합계
+  const avg = sum / scores.length; //평균
+  return [sum, avg]; 
+}
+
+/**
+ * 특정 학생의 성적을 추가한다.
+ * spread 연산자를 활용해 기존 scores 배열을 복제하고 새 점수를 추가한다.
+ */
+function addScore(studentName, newScore) {
+      const student = students.find(s => s.name === studentName);//학생찾기
+  if (student) {
+    student.scores = [...student.scores, newScore];
+  }
+}
+
+/**
+ * 모든 학생의 평균 점수를 계산하여,
+ * 가장 높은 평균과 가장 낮은 평균을 가진 학생을 찾아 리턴한다.
+ * reduce와 구조 분해 할당을 활용한다.
+ */
+function getTopAndBottomStudent() {
+  if (students.length === 0) return { top: null, bottom: null };
+
+  // 1. 각 학생의 이름과 평균 점수를 가진 새로운 배열을 만든다.
+  // 모든학생의 평균점수
+  const studentsWithAvg = students.map(student => {
+    const sum = student.scores.reduce((acc, score) => acc + score, 0);
+    const avg = sum / student.scores.length;
+    return { name: student.name, average: avg };
+  });
+
+  // 2. reduce를 사용해 최고점과 최저점 학생을 찾는다.
+  // acc(누적값)의 초기값은 첫 번째 학생 정보로 설정한다.
+  return studentsWithAvg.reduce((acc, current) => {
+    // 현재 학생의 평균이 acc에 저장된 최고 평균보다 높으면 top을 교체
+    if (current.average > acc.top.average) {
+      acc.top = current;
+    }
+    // 현재 학생의 평균이 acc에 저장된 최저 평균보다 낮으면 bottom을 교체
+    if (current.average < acc.bottom.average) {
+      acc.bottom = current;
+    }
+    return acc;
+  }, { top: studentsWithAvg[0], bottom: studentsWithAvg[0] }); // 초기값 설정
+}
+
+/**
+ * 학생 정보를 출력한다.
+ * 구조 분해 할당으로 {name, scores}를 꺼내서 출력한다.
+ */
+function printStudents() {
+  console.log("학생 정보 출력");
+  for (const student of students) {
+    // 구조 분해 할당으로 객체의 속성을 바로 변수로 추출
+    const { name, scores } = student;
+    console.log(`이름: ${name}, 점수: ${scores.join(', ')}`);
+  }
+
+}
+
+// 실행 예시
+printStudents();
+addScore("홍길동", 95);
+printStudents();
+
+const [sum, avg] = getSumAndAverage(90, 80, 70, 100);
+console.log(`합계: ${sum}, 평균: ${avg}`);
+
+console.log("평균 최고/최저 학생:", getTopAndBottomStudent());
+    </script>
+</body>
+</html>
